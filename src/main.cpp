@@ -5,9 +5,6 @@
 #include <cstdlib>
 // Create a Dispenser object
 
-#include <TinyStepper_28BYJ_48.h>
-
-Dispenser dispenser;
 const int buttonPin = 27;
 
 // The setup routine runs once when you press reset:
@@ -20,7 +17,6 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
 
-  
   
   // Initialize the dispenser
   // No need to use `new` for stack-allocated objects
@@ -58,7 +54,7 @@ void loop() {
   //
   delay(1000);
 
-  dispenser.dispense();
+  dispense();
   // delay(1000); 
 
   if (digitalRead(buttonPin) == HIGH) { 

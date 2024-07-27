@@ -1,5 +1,5 @@
-#ifndef HALFSTEPMOTOR_H
-#define HALFSTEPMOTOR_H
+#ifndef STEPPER_H
+#define STEPPER_H
 
 #include <Arduino.h>
 
@@ -17,6 +17,7 @@ private:
 
 public:
     HalfStepMotor(int p1, int p2, int p3, int p4);
+    ~HalfStepMotor() = default;
 
     int pos() const;
     void reset();
@@ -26,7 +27,6 @@ public:
     void stepDegrees(float degrees);
 
     static HalfStepMotor fromPins(int p1, int p2, int p3, int p4);
-
 };
 
-#endif // HALFSTEPMOTOR_H
+#endif // STEPPER_H
