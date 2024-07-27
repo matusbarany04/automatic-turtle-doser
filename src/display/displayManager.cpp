@@ -61,7 +61,7 @@ void testdrawchar(void) {
   display.display();
 }
 
-String description = "Hello this is a test";
+String description = " Hello this is a test";
 String leftButtontext =  "<-";
 String middleButtontext =  "O";
 String rightButtontext =  "->";
@@ -115,10 +115,25 @@ void drawMenu(void) {
   display.print(rightButtontext);
 
   // Update the display with the drawn content
-  display.display();
 
 
 }
+
+void invertButtonArea(int buttonIndex) {
+  int x = buttonIndex * display.width() / 3;
+  int y = 35;
+  int w = display.width() / 3;
+  int h = display.height() - y;
+
+  // Invert the button area
+  for (int i = 0; i < w; ++i) {
+    for (int j = 0; j < h; ++j) {
+      display.drawPixel(x + i, y + j, BLACK);
+    }
+  }
+  display.display();  // Update the display with the inverted area
+}
+
 
 void renderDisplay(){
    display.begin();
@@ -132,7 +147,22 @@ void renderDisplay(){
 
   drawMenu();
   
-  delay(2000);
+  // delay(2000);
+  display.display();
 
-  display.clearDisplay(); 
 }
+
+
+
+void drawSelectedIndicator(int y) {
+  // Draw a vertical line at the start of the display
+  display.drawLine(0, y, 0, y + 8, BLACK);
+  display.display();
+
+}
+
+
+void endRenderDisplay(){
+    display.clearDisplay(); 
+}
+

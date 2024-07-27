@@ -7,6 +7,12 @@ void testdrawchar();
 
 void renderDisplay();
 
+void endRenderDisplay();
+
 void initDisplay();
+
+void invertButtonArea(int buttonIndex);
+
+void drawSelectedIndicator(int y);
 
 #endif

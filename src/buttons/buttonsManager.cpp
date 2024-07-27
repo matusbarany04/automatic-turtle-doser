@@ -1,9 +1,9 @@
 #include "buttonsManager.h"
 
 // Define pin constants
-const int ButtonsManager::LEFT_PIN = 27;
-const int ButtonsManager::MIDDLE_PIN = 28; // might be reset pin
-const int ButtonsManager::RIGHT_PIN = 29;
+const int ButtonsManager::LEFT_PIN = 29;
+const int ButtonsManager::MIDDLE_PIN = 6; // might be reset pin
+const int ButtonsManager::RIGHT_PIN = 27;
 
 
 
@@ -16,6 +16,7 @@ ButtonsManager::ButtonsManager() {
 
 void ButtonsManager::setupButton(Bounce& button, int pin) {
     button.attach(pin);
+    pinMode(pin, INPUT_PULLUP);
     button.interval(25); // Debounce interval in milliseconds
 }
 
