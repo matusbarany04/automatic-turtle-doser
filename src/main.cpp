@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <display/display.h>
+#include <display/displayManager.h>
 #include <stepper/stepper.h>
 #include <stepper/dispenser.h>
 #include <cstdlib>
@@ -11,6 +11,7 @@ const int buttonPin = 27;
 // The setup routine runs once when you press reset:
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
+  initDisplay();
   Serial.begin(9600);              
 
   // Initialize the digital pin as an output.
@@ -23,6 +24,8 @@ void setup() {
   });
 }
 
+
+
 void loop() {
 
   delay(2000);
@@ -34,6 +37,10 @@ void loop() {
   //   exit(0);
   // }
 
+  renderDisplay();
+
   buttonsManager.checkButtons();
 }
+
+
 
