@@ -1,7 +1,7 @@
 #ifndef DISPENSER_H
 #define DISPENSER_H
 
-#include "stepper.h"
+#include <TinyStepper_28BYJ_48.h>
 
 // Constants
 extern const int MOTOR_IN1_PIN;
@@ -14,7 +14,7 @@ extern bool isEmpty;
 extern int slotCount;
 
 // Global stepper motor instance
-extern HalfStepMotor stepper;
+extern TinyStepper_28BYJ_48 stepper;
 
 // Function declarations
 void setupDispenser();

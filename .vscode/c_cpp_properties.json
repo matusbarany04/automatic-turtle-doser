@@ -10,6 +10,7 @@
             "includePath": [
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/include",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/src",
+                "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Bounce2/src",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit PCD8544 Nokia 5110 LCD library",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit GFX Library",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit BusIO",
@@ -67,6 +68,7 @@
                 "path": [
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/include",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/src",
+                    "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Bounce2/src",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit PCD8544 Nokia 5110 LCD library",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit GFX Library",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit BusIO",
