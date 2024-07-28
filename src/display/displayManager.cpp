@@ -45,6 +45,7 @@ void blink(){
 
 void initDisplay(){
     display.clearDisplay();
+    display.begin();
 
     display.display();
 }
@@ -61,10 +62,19 @@ void testdrawchar(void) {
   display.display();
 }
 
-String description = " Hello this is a test";
+String description = " Cas\n Otocit\n Svetlo";
 String leftButtontext =  "<-";
 String middleButtontext =  "O";
 String rightButtontext =  "->";
+
+
+void setDescription(String text) {
+  description = text;
+}
+
+void resetDescription(){
+  description = " Cas\n Otocit\n Svetlo";
+}
 
 void drawMenu(void) {
   display.setTextSize(1);
@@ -136,7 +146,6 @@ void invertButtonArea(int buttonIndex) {
 
 
 void renderDisplay(){
-   display.begin();
   // init done
 
   // you can change the contrast around to adapt the display

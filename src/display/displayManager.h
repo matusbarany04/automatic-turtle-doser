@@ -15,4 +15,8 @@ void invertButtonArea(int buttonIndex);
 
 void drawSelectedIndicator(int y);
 
+void setDescription(String text);
+
+void resetDescription();
+
 #endif
