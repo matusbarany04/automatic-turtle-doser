@@ -1,10 +1,10 @@
 #include "dispenser.h"
 #include <TinyStepper_28BYJ_48.h>
 
-const int MOTOR_IN1_PIN = 18;
-const int MOTOR_IN2_PIN = 19;
-const int MOTOR_IN3_PIN = 20;
-const int MOTOR_IN4_PIN = 22;
+const int MOTOR_IN1_PIN = 22;
+const int MOTOR_IN2_PIN = 20;
+const int MOTOR_IN3_PIN = 19;
+const int MOTOR_IN4_PIN = 18;
 bool isEmpty = false;
 int slotCount = 12; // Assuming a default slot count, adjust as necessary
 

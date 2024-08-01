@@ -12,15 +12,31 @@ bool backlight = true;
 
 int menuIndex = 0;
 int menuItems = 2;
+const int TIME_STEP = 15;
 
-unsigned long timeNow = 0;
-
+unsigned long timeNow = 12 * 60 / TIME_STEP;
+unsigned long dispenseTime = 15 * 60 / TIME_STEP;
 
 const int MAIN_MENU = 0;
 const int TIME_MENU = 1;
 const int CHANGE_CURRENT_TIME_SCREEN = 3;
 const int CHANGE_DISPENSE_TIME_SCREEN = 4;
 int currentMenu = MAIN_MENU;
+
+String minutesToTimeString(int minutes) {
+    int hours = minutes / 60;
+    int mins = minutes % 60;
+    char timeString[6]; // "HH:MM" + null terminator
+    snprintf(timeString, sizeof(timeString), "%02d:%02d", hours, mins);
+    return String(timeString);
+}
+
+int timeStringToMinutes(String timeString) {
+    int hours = timeString.substring(0, 2).toInt();
+    int mins = timeString.substring(3, 5).toInt();
+    return (hours * 60) + mins;
+}
+
 
 
 void backlightOn() {
@@ -34,34 +50,62 @@ void backlightOff() {
 
 }
 
+void updateCurrentTimeMenu(){
+    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
+}
+
+void updateDispenseTimeMenu(){
+    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
+}
+
 void incrementMenuIndex() {
     menuIndex++; 
     if (menuIndex > menuItems) menuIndex = 0;
+
+    if(currentMenu == CHANGE_CURRENT_TIME_SCREEN){
+      updateCurrentTimeMenu();
+    }
+    if (currentMenu == CHANGE_DISPENSE_TIME_SCREEN)
+    {
+      updateDispenseTimeMenu();
+    }
+    
 }
 
 void decrementMenuIndex() {
     menuIndex--;
     if(menuIndex < 0) menuIndex = 0;
+    
+    if(currentMenu == CHANGE_CURRENT_TIME_SCREEN){
+      updateCurrentTimeMenu();
+    }
+
+    if (currentMenu == CHANGE_DISPENSE_TIME_SCREEN)
+    {
+      updateDispenseTimeMenu();
+    }
 }
 
-void changeMenu(int menuIndex){
-  currentMenu = menuIndex;
+void changeMenu(int menu){
+  currentMenu = menu;
   menuIndex = 0;
   if(currentMenu == TIME_MENU){
     setDescription(" back\n time now\n dispense time");
     menuItems = 2;
   }
   else if (currentMenu == CHANGE_CURRENT_TIME_SCREEN){
-    setDescription("time now");
-    menuItems = 0;
+    menuItems = (60 * 24) / TIME_STEP;
+    menuIndex = timeNow;
+    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
   }
   else if (currentMenu == CHANGE_DISPENSE_TIME_SCREEN){
-    setDescription(" dispense time");
-    menuItems = 0;
+    menuIndex =  dispenseTime;
+    menuItems = (60 * 24) / TIME_STEP;
+    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
 
   }else if (currentMenu == MAIN_MENU)
   {
-    menuItems = 2;
+    menuItems = 60 * 24;
     resetDescription();
   }
   
@@ -130,6 +174,7 @@ void currentTimeMenu(){
   changeMenu(TIME_MENU);
 }
 
+
 void  runMenu(){
   switch (currentMenu)
   {
@@ -194,14 +239,11 @@ void setup() {
 }
 
 
-
-
-
 void loop() {
   renderDisplay();
   drawSelectedIndicator(menuIndex * 8);
   buttonsManager.checkButtons();
-
+  
 
   endRenderDisplay();
 }

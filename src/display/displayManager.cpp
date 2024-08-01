@@ -155,6 +155,7 @@ void renderDisplay(){
   // display.display(); // show splashscreen
 
   drawMenu();
+  delay(10);
   
   // delay(2000);
   display.display();
