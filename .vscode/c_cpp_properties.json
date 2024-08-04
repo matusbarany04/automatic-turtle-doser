@@ -10,6 +10,8 @@
             "includePath": [
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/include",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/src",
+                "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/LittleFS_Mbed_RP2040/src",
+                "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/ArduinoJson/src",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Bounce2/src",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit PCD8544 Nokia 5110 LCD library",
                 "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit GFX Library",
@@ -21,6 +23,7 @@
                 "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/cores/arduino/api/deprecated",
                 "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/cores/arduino/api/deprecated-avr-comp",
                 "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/variants/RASPBERRY_PI_PICO",
+                "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Unity/src",
                 "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/libraries/Arduino_CAN/src",
                 "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/libraries/Arduino_H7_Video/src",
                 "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/libraries/Camera/src",
@@ -68,6 +71,8 @@
                 "path": [
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/include",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/src",
+                    "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/LittleFS_Mbed_RP2040/src",
+                    "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/ArduinoJson/src",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Bounce2/src",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit PCD8544 Nokia 5110 LCD library",
                     "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Adafruit GFX Library",
@@ -79,6 +84,7 @@
                     "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/cores/arduino/api/deprecated",
                     "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/cores/arduino/api/deprecated-avr-comp",
                     "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/variants/RASPBERRY_PI_PICO",
+                    "/home/lenovolegion/Documents/PlatformIO/Projects/240727-121947-arduino-blink/.pio/libdeps/pico/Unity/src",
                     "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/libraries/Arduino_CAN/src",
                     "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/libraries/Arduino_H7_Video/src",
                     "/home/lenovolegion/.platformio/packages/framework-arduino-mbed/libraries/Camera/src",

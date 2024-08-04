@@ -5,6 +5,7 @@ const int MOTOR_IN1_PIN = 22;
 const int MOTOR_IN2_PIN = 20;
 const int MOTOR_IN3_PIN = 19;
 const int MOTOR_IN4_PIN = 18;
+
 bool isEmpty = false;
 int slotCount = 12; // Assuming a default slot count, adjust as necessary
 

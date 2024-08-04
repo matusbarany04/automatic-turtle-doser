@@ -1,9 +1,9 @@
 #include "buttonsManager.h"
 
 // Define pin constants
-const int ButtonsManager::LEFT_PIN = 29;
-const int ButtonsManager::MIDDLE_PIN = 6; // might be reset pin
-const int ButtonsManager::RIGHT_PIN = 27;
+const int ButtonsManager::LEFT_PIN = 9;
+const int ButtonsManager::MIDDLE_PIN = 8; // might be reset pin
+const int ButtonsManager::RIGHT_PIN = 7;
 
 
 

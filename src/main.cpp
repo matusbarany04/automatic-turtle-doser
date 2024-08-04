@@ -1,9 +1,12 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include <display/displayManager.h>
 #include <stepper/stepper.h>
 #include <stepper/dispenser.h>
 #include <cstdlib>
 #include "buttons/buttonsManager.h"
+// #include "files/SettingsManager.h"
+// #include "files/testIO.h"
 
 ButtonsManager buttonsManager;
 const int buttonPin = 27;
@@ -199,19 +202,24 @@ void  runMenu(){
   }
 }
 
+// SettingsManager settingsManager;
 
 // The setup routine runs once when you press reset:
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
   initDisplay();
-  Serial.begin(9600); 
+  Serial.begin(115200); 
+
+  while (!Serial)
+    delay(1000);
+
   pinMode(BACKLIGHT_PIN, OUTPUT);
+
   if(backlight){
     backlightOn();
   } else{
     backlightOff();
   }
-
   // Initialize the digital pin as an output.
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
@@ -236,8 +244,15 @@ void setup() {
     incrementMenuIndex();
 
   });
-}
 
+  int timeNow = 120; // Example value in minutes
+  int dispenseTime = 15; // Example value in minutes
+  bool backlight = true; // Example value
+
+  // testSetup();
+  // settingsManager.saveSettings(timeNow, dispenseTime, backlight);
+
+}
 
 void loop() {
   renderDisplay();
@@ -245,6 +260,7 @@ void loop() {
   buttonsManager.checkButtons();
   
 
+  
   endRenderDisplay();
 }
 

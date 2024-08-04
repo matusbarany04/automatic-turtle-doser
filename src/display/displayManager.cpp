@@ -10,6 +10,8 @@
 // pin 5 - Data/Command select (D/C)
 // pin 4 - LCD chip select (CS)
 // pin 3 - LCD reset (RST)
+
+//  Adafruit_PCD8544( sclk_pin,  din_pin,  dc_pin,  cs_pin,  rst_pin
 Adafruit_PCD8544 display = Adafruit_PCD8544(10, 11, 16, 12, 17);
 
 
