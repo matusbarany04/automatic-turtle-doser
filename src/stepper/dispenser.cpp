@@ -5,7 +5,7 @@ const int MOTOR_IN1_PIN = 22;
 const int MOTOR_IN2_PIN = 20;
 const int MOTOR_IN3_PIN = 19;
 const int MOTOR_IN4_PIN = 18;
-
+bool stopFlag = false;
 bool isEmpty = false;
 int slotCount = 12; // Assuming a default slot count, adjust as necessary
 
@@ -28,17 +28,30 @@ bool isDispenserEmpty() {
 }
 
 void dispense() {
+    stepper.setSpeedInStepsPerSecond(500);
+    stepper.setAccelerationInStepsPerSecondPerSecond(512);
     stepper.moveRelativeInSteps(2048 / slotCount);
 }
 
 void startConfiguration() {
+    stepper.setSpeedInStepsPerSecond(200);
+    stepper.setAccelerationInStepsPerSecondPerSecond(512);
+    stepper.setupMoveInSteps(2048 * 1000);
     // Implement configuration start logic here
+    // move stepper motor slowly without blocking the thread
+    stopFlag = false;
 }
 
 void stopConfiguration() {
     // Implement configuration stop logic here
+    //stop motor movement
+    stopFlag = true;
+    stepper.setupStop();
 }
 
-void stopRotation() {
-    // Implement rotation stop logic here
+void processMotor() {
+
+    if(!stopFlag && !stepper.motionComplete()){
+        stepper.processMovement();
+    }
 }

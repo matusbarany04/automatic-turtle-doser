@@ -2,22 +2,11 @@
 
 SettingsManager::SettingsManager() {
     Serial.print("\nStart LittleFS_Test on ");
-    Serial.println(BOARD_NAME);
-    Serial.println(LFS_MBED_RP2040_VERSION);
 
-    myFS = new LittleFS_MBED();
-    if (!myFS->init()) {
-        Serial.println("LITTLEFS Mount Failed");
-        initialized = false;
-    } else {
-        initialized = true;
-    }
-
-
+ 
 }
 
 SettingsManager::~SettingsManager() {
-    delete myFS;
 }
 
 void SettingsManager::readCharsFromFile(const char * path)
@@ -166,7 +155,6 @@ void SettingsManager::saveSettings(int timeNow, int dispenseTime, bool backlight
 
     char message[]  = "Hello from " BOARD_NAME "\n";
 
-    writeFile(settingsFilePath, message, sizeof(message));
     
     Serial.println("File written ... " );
 
@@ -176,7 +164,6 @@ void SettingsManager::loadSettings(int &timeNow, int &dispenseTime, bool &backli
     if (!initialized) return;
 
 
-    readFile(settingsFilePath);
 
 
     Serial.println("Settings loaded successfully.");

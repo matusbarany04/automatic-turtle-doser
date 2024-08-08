@@ -22,6 +22,6 @@ bool isDispenserEmpty();
 void dispense();
 void startConfiguration();
 void stopConfiguration();
-void stopRotation();
+void processMotor();
 
 #endif // DISPENSER_H

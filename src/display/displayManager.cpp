@@ -63,8 +63,8 @@ void testdrawchar(void) {
   }    
   display.display();
 }
-
-String description = " Cas\n Otocit\n Svetlo";
+String defaultDescription = " Cas\n Otocit\n Svetlo\n Motor";
+String description = defaultDescription;
 String leftButtontext =  "<-";
 String middleButtontext =  "O";
 String rightButtontext =  "->";
@@ -75,7 +75,7 @@ void setDescription(String text) {
 }
 
 void resetDescription(){
-  description = " Cas\n Otocit\n Svetlo";
+  description = defaultDescription;
 }
 
 void drawMenu(void) {

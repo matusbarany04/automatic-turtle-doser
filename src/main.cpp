@@ -1,12 +1,15 @@
 #include <Arduino.h>
-#include <ArduinoJson.h>
 #include <display/displayManager.h>
 #include <stepper/stepper.h>
 #include <stepper/dispenser.h>
 #include <cstdlib>
+#include <stdlib.h>
 #include "buttons/buttonsManager.h"
-// #include "files/SettingsManager.h"
-// #include "files/testIO.h"
+#include "files/SettingsManager.h"
+#include "hardware/flash.h"
+#include "hardware/sync.h"
+#include <stdio.h>
+
 
 ButtonsManager buttonsManager;
 const int buttonPin = 27;
@@ -14,17 +17,97 @@ const int BACKLIGHT_PIN = 5;
 bool backlight = true;
 
 int menuIndex = 0;
-int menuItems = 2;
+int menuItems = 3;
 const int TIME_STEP = 15;
 
-unsigned long timeNow = 12 * 60 / TIME_STEP;
-unsigned long dispenseTime = 15 * 60 / TIME_STEP;
+unsigned long timeNow = 0;
+unsigned long dispenseTime = 18 * 60 / TIME_STEP;
 
 const int MAIN_MENU = 0;
 const int TIME_MENU = 1;
 const int CHANGE_CURRENT_TIME_SCREEN = 3;
 const int CHANGE_DISPENSE_TIME_SCREEN = 4;
+const int MOTOR_CONF_MENU = 5;
+const int DEBUG_MENU = 6;
 int currentMenu = MAIN_MENU;
+
+int currentTimeOffset = 15 * 60 / TIME_STEP ;
+int absoluteTime = 0;
+
+#define FLASH_TARGET_OFFSET (256 * 1024)
+
+const uint8_t *flash_target_contents = (const uint8_t *)(XIP_BASE + FLASH_TARGET_OFFSET);
+
+#define DATA_SIZE (sizeof(int) * 2 + sizeof(bool))  // Total size needed to store two ints and one bool
+#define FLASH_PAGE_SIZE (256)  // Flash page size
+#define FLASH_SECTOR_SIZE (4096)  // Flash sector size
+
+
+// Function to get the current time in minutes since the program started
+int getAbsoluteTimeInMinutes() {
+    absolute_time_t now = get_absolute_time();
+    int64_t now_us = to_us_since_boot(now);
+    
+     // not sure if i should divide by time step !!!!
+    return (now_us / 60000000); // % (24 * 60 / TIME_STEP); // Convert microseconds to minutes, modulo them to repeat
+}
+int getCurrentTimeInMinutes(){
+  int64_t absoluteTime =  getAbsoluteTimeInMinutes();
+  
+  timeNow = (absoluteTime + currentTimeOffset) % (24 * 60 / TIME_STEP);
+  return timeNow;
+}
+
+
+// Define data structure for storage
+
+void print_buf(const uint8_t *buf, size_t len) {
+    for (size_t i = 0; i < len; ++i) {
+        Serial.print(buf[i], HEX);
+        if (i % 16 == 15)
+            Serial.println();
+        else
+            Serial.print(" ");
+    }
+}
+
+
+void write_data_to_flash(const uint8_t* data, size_t size) {
+    Serial.println("Starting flash write...");
+
+    // Ensure size is correctly aligned
+    if (FLASH_TARGET_OFFSET % FLASH_PAGE_SIZE != 0 || size % FLASH_PAGE_SIZE != 0) {
+        Serial.println("Error: Offset or size is not aligned to page size.");
+        return;
+    }
+
+    // Disable interrupts
+    uint32_t ints = save_and_disable_interrupts();
+
+    // Erase the flash sector
+    flash_range_erase(FLASH_TARGET_OFFSET, FLASH_SECTOR_SIZE);
+    Serial.println("Flash sector erased.");
+
+    // Write the data to the flash
+    flash_range_program(FLASH_TARGET_OFFSET, data, size);
+    Serial.println("Flash written.");
+
+    // Restore interrupts
+    restore_interrupts(ints);
+
+    Serial.println("Flash write complete.");
+}
+
+void read_data_from_flash(uint8_t* data, size_t size) {
+    Serial.println("Reading data from flash...");
+
+    
+    // Read the data from flash
+    memcpy(data, flash_target_contents, size);
+
+    Serial.println("Data read from flash:");
+    print_buf(data, size);
+}
 
 String minutesToTimeString(int minutes) {
     int hours = minutes / 60;
@@ -33,14 +116,11 @@ String minutesToTimeString(int minutes) {
     snprintf(timeString, sizeof(timeString), "%02d:%02d", hours, mins);
     return String(timeString);
 }
-
 int timeStringToMinutes(String timeString) {
     int hours = timeString.substring(0, 2).toInt();
     int mins = timeString.substring(3, 5).toInt();
     return (hours * 60) + mins;
 }
-
-
 
 void backlightOn() {
   digitalWrite(BACKLIGHT_PIN, LOW);
@@ -93,8 +173,8 @@ void changeMenu(int menu){
   currentMenu = menu;
   menuIndex = 0;
   if(currentMenu == TIME_MENU){
-    setDescription(" back\n time now\n dispense time");
-    menuItems = 2;
+    setDescription(" spat\n cas teraz\n cas jedlo\n debug");
+    menuItems =  3;
   }
   else if (currentMenu == CHANGE_CURRENT_TIME_SCREEN){
     menuItems = (60 * 24) / TIME_STEP;
@@ -108,8 +188,14 @@ void changeMenu(int menu){
 
   }else if (currentMenu == MAIN_MENU)
   {
-    menuItems = 60 * 24;
+    menuItems = 3;
     resetDescription();
+  }else if(currentMenu == MOTOR_CONF_MENU){
+    setDescription(" spat\n Start\n Stop");
+    menuItems = 2;
+  }else if (currentMenu == DEBUG_MENU){
+    setDescription(" spat");
+    menuItems = 0;
   }
   
 }
@@ -127,17 +213,33 @@ void timeMenu(){
   case 2: // dispense time
     changeMenu(CHANGE_DISPENSE_TIME_SCREEN);
     break;
+  case 3: // dispense time
+    changeMenu(DEBUG_MENU);
+    break;
   default:
     break;
   }
 }
-
-
+void motorMenu(){
+  
+  switch (menuIndex)
+  {  
+    case 0:
+      changeMenu(MAIN_MENU);
+      break;
+    case 1:
+      startConfiguration();
+      break;
+    case 2:
+      stopConfiguration();
+      break;
+    default:
+      break;
+  }
+}
 
 // this menu contains following items, time, dispense, 
 void startMenu(){
-
-
   switch (menuIndex)
   {  
     case 0:
@@ -161,6 +263,9 @@ void startMenu(){
       }
 
       break;
+    case 3: // motor conf
+      changeMenu(MOTOR_CONF_MENU);
+      break;
     default:
       break;
   }
@@ -169,12 +274,34 @@ void startMenu(){
 }
 
 void dispenseTimeMenu(){
+  dispenseTime = menuIndex;
   changeMenu(TIME_MENU);
 }
 
 void currentTimeMenu(){
-  timeNow = menuIndex;
+  Serial.println(menuIndex);
+  Serial.println(timeNow);
+  
+  currentTimeOffset += menuIndex - timeNow;
+
   changeMenu(TIME_MENU);
+}
+
+void debugMenu(){
+  changeMenu(TIME_MENU);
+}
+
+void debugUpdate(){
+  
+  int timeNows = getCurrentTimeInMinutes();
+  Serial.println(timeNows);
+
+  char description[15]; 
+  sprintf(description, "spat \n %d:%d", 
+  (timeNows * 15 / 60), 
+  (timeNows * 15 - (timeNows * 15 / 60) * 60));
+
+  setDescription(description);
 }
 
 
@@ -196,22 +323,25 @@ void  runMenu(){
     case CHANGE_DISPENSE_TIME_SCREEN:
       dispenseTimeMenu();
       break;
-    
+    case MOTOR_CONF_MENU:
+      motorMenu();
+      break;
+    case DEBUG_MENU:
+      debugMenu();
+      break;
     default:
       break;
   }
 }
 
-// SettingsManager settingsManager;
+// SettingsManager settingsManager
 
-// The setup routine runs once when you press reset:
+
 void setup() {
+
+
   pinMode(buttonPin, INPUT_PULLUP);
   initDisplay();
-  Serial.begin(115200); 
-
-  while (!Serial)
-    delay(1000);
 
   pinMode(BACKLIGHT_PIN, OUTPUT);
 
@@ -245,21 +375,36 @@ void setup() {
 
   });
 
-  int timeNow = 120; // Example value in minutes
-  int dispenseTime = 15; // Example value in minutes
-  bool backlight = true; // Example value
-
-  // testSetup();
-  // settingsManager.saveSettings(timeNow, dispenseTime, backlight);
 
 }
+bool dispensed = false;
 
 void loop() {
+  processMotor();
   renderDisplay();
+  if(currentMenu == DEBUG_MENU){
+    debugUpdate();
+  }
   drawSelectedIndicator(menuIndex * 8);
   buttonsManager.checkButtons();
-  
 
+  absoluteTime = getCurrentTimeInMinutes();
+
+  // change time now too
+  Serial.print(timeNow * 15 / 60); 
+  Serial.print(":");
+  Serial.println(timeNow * 15 - (timeNow * 15 / 60) * 60);
+
+
+  if(!dispensed && timeNow >= dispenseTime){
+    dispense();
+    dispensed = true;
+  }
+
+
+  if(dispensed && timeNow < dispenseTime){
+    dispensed = false;
+  }
   
   endRenderDisplay();
 }
