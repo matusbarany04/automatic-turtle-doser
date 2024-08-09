@@ -32,11 +32,25 @@ void ButtonsManager::onRightClick(const ClickListener& listener) {
     rightClickListener = listener;
 }
 
+void ButtonsManager::onLeftHold(const HoldListener& listener) {
+    leftHoldListener = listener;
+}
+
+void ButtonsManager::onMiddleHold(const HoldListener& listener) {
+    middleHoldListener = listener;
+}
+
+void ButtonsManager::onRightHold(const HoldListener& listener) {
+    rightHoldListener = listener;
+}   
+
 void ButtonsManager::checkButtons() {
     leftButton.update();
     middleButton.update();
     rightButton.update();
 
+
+    
     if (leftButton.fell()) {
         if (leftClickListener) {
             leftClickListener();
@@ -47,11 +61,31 @@ void ButtonsManager::checkButtons() {
         if (middleClickListener) {
             middleClickListener();
         }
+
     }
 
     if (rightButton.fell()) {
         if (rightClickListener) {
             rightClickListener();
+        }
+
+    }
+
+    if(leftButton.currentDuration() > 500 && leftButton.read() == LOW){
+        if(leftHoldListener){
+            leftHoldListener(leftButton.currentDuration());
+        }
+    }
+
+    if(middleButton.currentDuration() > 500 &&  middleButton.read() == LOW){
+        if(middleHoldListener){
+          middleHoldListener(middleButton.currentDuration());
+        }
+    }
+
+    if(rightButton.currentDuration() > 500 && rightButton.read() == LOW){
+        if(rightHoldListener){
+            rightHoldListener(rightButton.currentDuration());
         }
     }
 }

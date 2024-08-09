@@ -8,12 +8,18 @@
 class ButtonsManager {
 public:
     using ClickListener = std::function<void()>;
+    using HoldListener = std::function<void(int duration)>;
 
     ButtonsManager();
 
     void onLeftClick(const ClickListener& listener);
     void onMiddleClick(const ClickListener& listener);
     void onRightClick(const ClickListener& listener);
+
+    void onLeftHold(const HoldListener& listener);
+    void onMiddleHold(const HoldListener& listener);
+    void onRightHold(const HoldListener& listener);
+
 
     void checkButtons();
 
@@ -29,6 +35,9 @@ private:
     ClickListener leftClickListener;
     ClickListener middleClickListener;
     ClickListener rightClickListener;
+    HoldListener leftHoldListener;
+    HoldListener middleHoldListener;
+    HoldListener rightHoldListener;
 
     void setupButton(Bounce& button, int pin);
 };

@@ -9,19 +9,20 @@
 #include "hardware/flash.h"
 #include "hardware/sync.h"
 #include <stdio.h>
-
+#include <math.h>
 
 ButtonsManager buttonsManager;
 const int buttonPin = 27;
 const int BACKLIGHT_PIN = 5;
 bool backlight = true;
+bool dispensed = false;
 
 int menuIndex = 0;
 int menuItems = 3;
 const int TIME_STEP = 15;
 
 unsigned long timeNow = 0;
-unsigned long dispenseTime = 18 * 60 / TIME_STEP;
+unsigned long dispenseTime = 18 * 60;
 
 const int MAIN_MENU = 0;
 const int TIME_MENU = 1;
@@ -29,9 +30,9 @@ const int CHANGE_CURRENT_TIME_SCREEN = 3;
 const int CHANGE_DISPENSE_TIME_SCREEN = 4;
 const int MOTOR_CONF_MENU = 5;
 const int DEBUG_MENU = 6;
-int currentMenu = MAIN_MENU;
+int currentMenu = DEBUG_MENU;
 
-int currentTimeOffset = 15 * 60 / TIME_STEP ;
+int currentTimeOffset = 15 * 60 ;
 int absoluteTime = 0;
 
 #define FLASH_TARGET_OFFSET (256 * 1024)
@@ -46,15 +47,14 @@ const uint8_t *flash_target_contents = (const uint8_t *)(XIP_BASE + FLASH_TARGET
 // Function to get the current time in minutes since the program started
 int getAbsoluteTimeInMinutes() {
     absolute_time_t now = get_absolute_time();
-    int64_t now_us = to_us_since_boot(now);
-    
-     // not sure if i should divide by time step !!!!
+    int64_t now_us = to_us_since_boot(now); /// TIME_STEP;
+
     return (now_us / 60000000); // % (24 * 60 / TIME_STEP); // Convert microseconds to minutes, modulo them to repeat
 }
-int getCurrentTimeInMinutes(){
-  int64_t absoluteTime =  getAbsoluteTimeInMinutes();
+int updateCurrentTime(){
+  absoluteTime =  getAbsoluteTimeInMinutes();
   
-  timeNow = (absoluteTime + currentTimeOffset) % (24 * 60 / TIME_STEP);
+  timeNow = (absoluteTime + currentTimeOffset) % (24 * 60);
   return timeNow;
 }
 
@@ -134,11 +134,11 @@ void backlightOff() {
 }
 
 void updateCurrentTimeMenu(){
-    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
+    setDescription(minutesToTimeString(menuIndex)); 
 }
 
 void updateDispenseTimeMenu(){
-    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
+    setDescription(minutesToTimeString(menuIndex)); 
 }
 
 void incrementMenuIndex() {
@@ -177,14 +177,14 @@ void changeMenu(int menu){
     menuItems =  3;
   }
   else if (currentMenu == CHANGE_CURRENT_TIME_SCREEN){
-    menuItems = (60 * 24) / TIME_STEP;
+    menuItems = (60 * 24); /// TIME_STEP;
     menuIndex = timeNow;
-    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
+    setDescription(minutesToTimeString(menuIndex)); // * TIME_STEP
   }
   else if (currentMenu == CHANGE_DISPENSE_TIME_SCREEN){
     menuIndex =  dispenseTime;
-    menuItems = (60 * 24) / TIME_STEP;
-    setDescription(minutesToTimeString(menuIndex * TIME_STEP));
+    menuItems = (60 * 24) ;
+    setDescription(minutesToTimeString(menuIndex)); // * TIME_STEP
 
   }else if (currentMenu == MAIN_MENU)
   {
@@ -293,17 +293,17 @@ void debugMenu(){
 
 void debugUpdate(){
   
-  int timeNows = getCurrentTimeInMinutes();
+  int timeNows = updateCurrentTime();
   Serial.println(timeNows);
 
   char description[15]; 
-  sprintf(description, "spat \n %d:%d", 
-  (timeNows * 15 / 60), 
-  (timeNows * 15 - (timeNows * 15 / 60) * 60));
+  // sprintf(description, "spat \n %d:%d", 
+  // (timeNows * 15 / 60), 
+  // (timeNows * 15 - (timeNows * 15 / 60) * 60));
+  sprintf(description,"spat \n %d", timeNows);
 
   setDescription(description);
 }
-
 
 void  runMenu(){
   switch (currentMenu)
@@ -335,8 +335,6 @@ void  runMenu(){
 }
 
 // SettingsManager settingsManager
-
-
 void setup() {
 
 
@@ -357,9 +355,24 @@ void setup() {
   setupDispenser();
   buttonsManager.onLeftClick([]() {
     invertButtonArea(0);
-    delay(200);
+    delay(100);
     decrementMenuIndex();
   });
+
+  buttonsManager.onLeftHold([](int duration) {
+    invertButtonArea(0);
+    delay(max(50 - 20 * log10(duration), 0));
+    if(duration > 1000){
+      decrementMenuIndex();
+    }
+    if(duration > 5000){
+      decrementMenuIndex();
+      decrementMenuIndex();
+      decrementMenuIndex();
+    }
+    decrementMenuIndex();
+  });
+  
 
    buttonsManager.onMiddleClick([]() {
     invertButtonArea(1);
@@ -370,14 +383,26 @@ void setup() {
 
    buttonsManager.onRightClick([]() {
     invertButtonArea(2);
-    delay(200);
+    delay(100);
     incrementMenuIndex();
 
   });
 
+   buttonsManager.onRightHold([](int duration) {
+    invertButtonArea(2);
+    delay(max(50 - 20 * log10(duration), 0));
+     if(duration > 1000){
+      incrementMenuIndex();
+    }
+    if(duration > 5000){
+      incrementMenuIndex();
+      incrementMenuIndex();
+      incrementMenuIndex();
+    }
+    incrementMenuIndex();
+  });
 
 }
-bool dispensed = false;
 
 void loop() {
   processMotor();
@@ -388,7 +413,7 @@ void loop() {
   drawSelectedIndicator(menuIndex * 8);
   buttonsManager.checkButtons();
 
-  absoluteTime = getCurrentTimeInMinutes();
+  absoluteTime = updateCurrentTime();
 
   // change time now too
   Serial.print(timeNow * 15 / 60); 
