@@ -9,6 +9,19 @@
 #include "hardware/flash.h"
 #include "hardware/sync.h"
 #include <stdio.h>
+#include <Wire.h>
+#include <TimeLib.h>
+
+// #include <Adafruit_TinyUSB_FlashTransport_RP2040.h>
+
+// Define I2C addresses to check for the display
+#define I2C_ADDR_1 0x3C  // Example address for SSD1306 OLED display
+#define I2C_ADDR_2 0x70  // Example address for HT16K33 segment display
+
+
+bool displayPresent = false;
+
+#include "pico/time.h"
 #include <math.h>
 
 ButtonsManager buttonsManager;
@@ -30,26 +43,17 @@ const int CHANGE_CURRENT_TIME_SCREEN = 3;
 const int CHANGE_DISPENSE_TIME_SCREEN = 4;
 const int MOTOR_CONF_MENU = 5;
 const int DEBUG_MENU = 6;
-int currentMenu = DEBUG_MENU;
+int currentMenu = MAIN_MENU;
 
 int currentTimeOffset = 15 * 60 ;
 int absoluteTime = 0;
 
-#define FLASH_TARGET_OFFSET (256 * 1024)
-
-const uint8_t *flash_target_contents = (const uint8_t *)(XIP_BASE + FLASH_TARGET_OFFSET);
-
-#define DATA_SIZE (sizeof(int) * 2 + sizeof(bool))  // Total size needed to store two ints and one bool
-#define FLASH_PAGE_SIZE (256)  // Flash page size
-#define FLASH_SECTOR_SIZE (4096)  // Flash sector size
-
-
 // Function to get the current time in minutes since the program started
 int getAbsoluteTimeInMinutes() {
-    absolute_time_t now = get_absolute_time();
-    int64_t now_us = to_us_since_boot(now); /// TIME_STEP;
+  int  minutes  = minute();
+  int hours = hour();
 
-    return (now_us / 60000000); // % (24 * 60 / TIME_STEP); // Convert microseconds to minutes, modulo them to repeat
+  return minutes + hours * 60; 
 }
 int updateCurrentTime(){
   absoluteTime =  getAbsoluteTimeInMinutes();
@@ -58,56 +62,6 @@ int updateCurrentTime(){
   return timeNow;
 }
 
-
-// Define data structure for storage
-
-void print_buf(const uint8_t *buf, size_t len) {
-    for (size_t i = 0; i < len; ++i) {
-        Serial.print(buf[i], HEX);
-        if (i % 16 == 15)
-            Serial.println();
-        else
-            Serial.print(" ");
-    }
-}
-
-
-void write_data_to_flash(const uint8_t* data, size_t size) {
-    Serial.println("Starting flash write...");
-
-    // Ensure size is correctly aligned
-    if (FLASH_TARGET_OFFSET % FLASH_PAGE_SIZE != 0 || size % FLASH_PAGE_SIZE != 0) {
-        Serial.println("Error: Offset or size is not aligned to page size.");
-        return;
-    }
-
-    // Disable interrupts
-    uint32_t ints = save_and_disable_interrupts();
-
-    // Erase the flash sector
-    flash_range_erase(FLASH_TARGET_OFFSET, FLASH_SECTOR_SIZE);
-    Serial.println("Flash sector erased.");
-
-    // Write the data to the flash
-    flash_range_program(FLASH_TARGET_OFFSET, data, size);
-    Serial.println("Flash written.");
-
-    // Restore interrupts
-    restore_interrupts(ints);
-
-    Serial.println("Flash write complete.");
-}
-
-void read_data_from_flash(uint8_t* data, size_t size) {
-    Serial.println("Reading data from flash...");
-
-    
-    // Read the data from flash
-    memcpy(data, flash_target_contents, size);
-
-    Serial.println("Data read from flash:");
-    print_buf(data, size);
-}
 
 String minutesToTimeString(int minutes) {
     int hours = minutes / 60;
@@ -274,16 +228,14 @@ void startMenu(){
 }
 
 void dispenseTimeMenu(){
+  dispensed = true;
   dispenseTime = menuIndex;
   changeMenu(TIME_MENU);
 }
 
 void currentTimeMenu(){
-  Serial.println(menuIndex);
-  Serial.println(timeNow);
-  
+  dispensed = true;
   currentTimeOffset += menuIndex - timeNow;
-
   changeMenu(TIME_MENU);
 }
 
@@ -293,15 +245,14 @@ void debugMenu(){
 
 void debugUpdate(){
   
-  int timeNows = updateCurrentTime();
-  Serial.println(timeNows);
+  updateCurrentTime();
 
-  char description[15]; 
+  char description[30]; 
   // sprintf(description, "spat \n %d:%d", 
   // (timeNows * 15 / 60), 
   // (timeNows * 15 - (timeNows * 15 / 60) * 60));
-  sprintf(description,"spat \n %d", timeNows);
-
+  sprintf(description,"spat \n %ld \n %02ld:%02ld:%02ld", timeNow, timeNow / 60 ,timeNow - (timeNow / 60) * 60, second());
+  
   setDescription(description);
 }
 
@@ -311,15 +262,12 @@ void  runMenu(){
     case MAIN_MENU:
       startMenu();
       break;
-
     case TIME_MENU:
       timeMenu();
       break;
-  
     case CHANGE_CURRENT_TIME_SCREEN:
       currentTimeMenu();
       break;
-
     case CHANGE_DISPENSE_TIME_SCREEN:
       dispenseTimeMenu();
       break;

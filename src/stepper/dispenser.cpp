@@ -18,7 +18,7 @@ void setupDispenser() {
     digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
     // Initialize the stepper motor here
     stepper.setSpeedInStepsPerSecond(500);
-    stepper.setAccelerationInStepsPerSecondPerSecond(512);
+    stepper.setAccelerationInStepsPerSecondPerSecond(2048);
 
     stepper.connectToPins(MOTOR_IN1_PIN, MOTOR_IN2_PIN, MOTOR_IN3_PIN, MOTOR_IN4_PIN);
 }
@@ -28,14 +28,14 @@ bool isDispenserEmpty() {
 }
 
 void dispense() {
-    stepper.setSpeedInStepsPerSecond(500);
-    stepper.setAccelerationInStepsPerSecondPerSecond(512);
+    stepper.setSpeedInStepsPerSecond(200);
+    stepper.setAccelerationInStepsPerSecondPerSecond(100);
     stepper.moveRelativeInSteps(2048 / slotCount);
 }
 
 void startConfiguration() {
-    stepper.setSpeedInStepsPerSecond(200);
-    stepper.setAccelerationInStepsPerSecondPerSecond(512);
+    stepper.setSpeedInStepsPerSecond(100);
+    stepper.setAccelerationInStepsPerSecondPerSecond(100);
     stepper.setupMoveInSteps(2048 * 1000);
     // Implement configuration start logic here
     // move stepper motor slowly without blocking the thread

@@ -153,7 +153,7 @@ void SettingsManager::saveSettings(int timeNow, int dispenseTime, bool backlight
 
     Serial.println("- writing" );
 
-    char message[]  = "Hello from " BOARD_NAME "\n";
+    // char message[]  = "Hello from " BOARD_NAME "\n";
 
     
     Serial.println("File written ... " );
